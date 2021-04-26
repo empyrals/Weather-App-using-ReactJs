@@ -1,23 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
+  const [input, setInput] = useState("");
+  const [weather, setWeather] = useState(null);
+  useEffect(() => {
+    axios
+      .get(
+        "http://api.weatherapi.com/v1/current.json?key=51fcb87721874f37bc5115446212604&q=London&aqi=no"
+      )
+      .then((data) => setWeather(data.data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  const weatherInput = (e) => {
+    // console.log(e.target.value);
+    setInput(e.target.value);
+  };
+
+  const searchWeather = () => {
+    axios
+      .get(
+        `http://api.weatherapi.com/v1/current.json?key=51fcb87721874f37bc5115446212604&q=${input}`
+      )
+      .then((data) => {
+        setWeather(data.data);
+        // console.log(data);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {weather && (
+        <div>
+          <div className="search">
+            <input onChange={weatherInput} type="text" />
+            <button onClick={searchWeather}> Search</button>
+          </div>
+          <div className="weather-info">
+            <h1>{weather.location.country}</h1>
+            <h2>{weather.location.region}</h2>
+            <div className="condition">
+              <h3>{weather.current.condition.text}</h3>
+              <img src={weather.current.condition.icon} alt="" />
+            </div>
+            <h3>Current Temp: {weather.current.temp_c} Celcius</h3>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
